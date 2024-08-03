@@ -2,6 +2,7 @@
 Solitaire clone.
 """
 import arcade
+import random
 
 # Screen title and size
 SCREEN_WIDTH = 1024
@@ -125,6 +126,15 @@ class MyGame(arcade.Window):
                 card = Card(card_suit, card_value, CARD_SCALE)
                 card.position = START_X, BOTTOM_Y
                 self.card_list.append(card)
+
+        # Shuffle the cards 
+        # EK note - why can't I use random.shuffle(self.card_list)?
+        # ChatGPT says it's because random.shuffle directly swaps elements in the list in-place, 
+        # and it seems that the SpriteList from the Arcade library has additional checks and constraints 
+        # that prevent such operations from happening directly. 
+        for pos1 in range(len(self.card_list)):
+            pos2 = random.randrange(len(self.card_list))
+            self.card_list.swap(pos1, pos2)
 
     def on_draw(self):
         """ Render the screen. """
