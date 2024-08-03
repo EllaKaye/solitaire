@@ -28,6 +28,15 @@ HORIZONTAL_MARGIN_PERCENT = 0.10
 # The Y of the bottom row (2 piles)
 BOTTOM_Y = MAT_HEIGHT / 2 + MAT_HEIGHT * VERTICAL_MARGIN_PERCENT
 
+# The Y of the top row (4 piles)
+TOP_Y = SCREEN_HEIGHT - MAT_HEIGHT / 2 - MAT_HEIGHT * VERTICAL_MARGIN_PERCENT
+
+# The Y of the middle row (7 piles)
+MIDDLE_Y = TOP_Y - MAT_HEIGHT - MAT_HEIGHT * VERTICAL_MARGIN_PERCENT
+
+# How far apart each pile goes
+X_SPACING = MAT_WIDTH + MAT_WIDTH * HORIZONTAL_MARGIN_PERCENT
+
 # The X of where to start putting things on the left side
 START_X = MAT_WIDTH / 2 + MAT_WIDTH * HORIZONTAL_MARGIN_PERCENT
 
@@ -69,6 +78,9 @@ class MyGame(arcade.Window):
         # Original location of cards we are dragging with the mouse in case they have to go back
         self.held_cards_original_position = None
 
+        # Sprite list with all the mats that cards lay on
+        self.pile_mat_list = None
+
     def setup(self):
         """ Set up the game here. Call this function to restart the game. """
 
@@ -77,6 +89,32 @@ class MyGame(arcade.Window):
 
         # Original location of the cards we are dragging with the mouse in case they have to go back
         self.held_cards_original_position = []
+
+        # --- Create the mats the cards go on
+
+        # Sprite list with all the mats the cards lay on
+        self.pile_mat_list: arcade.SpriteList = arcade.SpriteList()
+
+        # Create the mats for the bottom face down and face up piles
+        pile = arcade.SpriteSolidColor(MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+        pile.position = START_X, BOTTOM_Y,
+        self.pile_mat_list.append(pile)
+
+        pile = arcade.SpriteSolidColor(MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+        pile.position = START_X + X_SPACING, BOTTOM_Y,
+        self.pile_mat_list.append(pile)
+
+        # Create the seven middle piles
+        for i in range(7):
+            pile = arcade.SpriteSolidColor(MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+            pile.position = START_X + i * X_SPACING, MIDDLE_Y,
+            self.pile_mat_list.append(pile)        
+
+        # Create the top "play" piles
+        for i in range(4):
+            pile = arcade.SpriteSolidColor(MAT_WIDTH, MAT_HEIGHT, arcade.csscolor.DARK_OLIVE_GREEN)
+            pile.position = START_X + i * X_SPACING, TOP_Y,
+            self.pile_mat_list.append(pile) 
 
         # Sprite list with all the cards, no matter what pile they are in.
         self.card_list = arcade.SpriteList()
@@ -92,6 +130,9 @@ class MyGame(arcade.Window):
         """ Render the screen. """
         # Clear the screen
         self.clear()
+
+        # Draw the mats the cards go on to
+        self.pile_mat_list.draw()
 
         # Draw the cards
         self.card_list.draw()
@@ -114,6 +155,7 @@ class MyGame(arcade.Window):
 
             # Might be a stack of cards, get the top one
             primary_card = cards[-1]
+            #print(f"Clicked on card {primary_card.value} of {primary_card.suit}")
 
             # All other cases, grab the face-up card we are clicking on
             self.held_cards = [primary_card]
