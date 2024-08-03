@@ -172,6 +172,28 @@ class MyGame(arcade.Window):
         if len(self.held_cards) == 0:
             return
 
+        # Find the closest pile, in case we are in contact with more than one
+        pile, distance = arcade.get_closest_sprite(self.held_cards[0], self.pile_mat_list)
+        reset_position = True
+
+        # See if we are in contact with the closest pile
+        if arcade.check_for_collision(self.held_cards[0], pile):
+
+            # For each held card, move it to the pile we dropped on
+            for i, dropped_card in enumerate(self.held_cards):
+                dropped_card.position = pile.center_x, pile.center_y
+
+            # Success, don't reset position of cards
+            reset_position = False
+
+        # Release on top play pile? And onle one card held?
+        if reset_position:
+            # Whereover we were dropped, it wasn't valid
+            # Reset each card's position to its original spot
+            for pile_index, card in enumerate(self.held_cards):
+                card.position = self.held_cards_original_position[pile_index]
+
+
         # We are no longer holding cards
         self.held_cards = []
 
